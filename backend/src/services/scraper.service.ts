@@ -18,20 +18,18 @@ export async function fetchPage(url: string): Promise<ScrapedPage> {
   const startedAt = process.hrtime.bigint();
 
   try {
-    const response = await axios.get<string>(url, {
-      timeout: FETCH_TIMEOUT_MS,
-      maxRedirects: MAX_REDIRECTS,
-      responseType: 'text',
-      // Accept any status so we can inspect it ourselves rather than
-      // having axios throw for 404/500 — we want to report those, not crash.
-      validateStatus: () => true,
-      headers: {
-        'User-Agent': USER_AGENT,
-        Accept: 'text/html,application/xhtml+xml',
-      },
-      // Guard against axios trying to decompress/parse huge binary payloads.
-      maxContentLength: 15 * 1024 * 1024, // 15MB
-    });
+    const response = await axios.get(url, {
+  timeout: 10000,
+  maxRedirects: 5,
+  headers: {
+    "User-Agent":
+      "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36",
+    "Accept":
+      "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+    "Accept-Language": "en-US,en;q=0.9",
+  },
+  validateStatus: (status) => status < 500,
+});
 
     const responseTimeMs = elapsedMs(startedAt);
     const contentType = String(response.headers['content-type'] || '').toLowerCase();
