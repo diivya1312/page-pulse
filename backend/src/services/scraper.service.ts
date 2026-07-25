@@ -19,17 +19,15 @@ export async function fetchPage(url: string): Promise<ScrapedPage> {
 
   try {
     const response = await axios.get(url, {
-  timeout: 10000,
-  maxRedirects: 5,
+  timeout: FETCH_TIMEOUT_MS,
+  maxRedirects: MAX_REDIRECTS,
   headers: {
-    "User-Agent":
-      "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36",
-    "Accept":
-      "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
-    "Accept-Language": "en-US,en;q=0.9",
+    "User-Agent": USER_AGENT,
   },
-  validateStatus: (status) => status < 500,
+  responseType: 'text',
+  validateStatus: () => true, // Accept all HTTP status codes; we'll handle them manually
 });
+
 
     const responseTimeMs = elapsedMs(startedAt);
     const contentType = String(response.headers['content-type'] || '').toLowerCase();
